@@ -110,18 +110,30 @@ OR: Appearance → Editor → Header template → Add Custom HTML block
 /* Hide header/footer when page is embedded in an iframe */
 html.in-iframe header.wp-block-template-part,
 html.in-iframe .easy-notification-bar,
-html.in-iframe footer {
+html.in-iframe .easy-notification-bar *,
+html.in-iframe footer,
+html.in-iframe #wpadminbar {
   display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 html.in-iframe .wp-site-blocks {
   padding-top: 0 !important;
+  margin-top: 0 !important;
 }
 </style>
 <script>
-// Detect iframe embedding and add class to html element
+// Detect iframe embedding: hide header/footer and add class
 (function(){
   if(window.self !== window.top){
     document.documentElement.classList.add('in-iframe');
+    // Also inject a style tag immediately for faster hiding (before DOMContentLoaded)
+    var s = document.createElement('style');
+    s.textContent = '.easy-notification-bar,.easy-notification-bar *,header.wp-block-template-part,footer{display:none!important}';
+    document.head.appendChild(s);
   }
 })();
 </script>
