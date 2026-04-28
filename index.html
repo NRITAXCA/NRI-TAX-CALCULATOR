@@ -130,10 +130,23 @@ html.in-iframe .wp-site-blocks {
 (function(){
   if(window.self !== window.top){
     document.documentElement.classList.add('in-iframe');
-    // Also inject a style tag immediately for faster hiding (before DOMContentLoaded)
+    // Inject style immediately
     var s = document.createElement('style');
-    s.textContent = '.easy-notification-bar,.easy-notification-bar *,header.wp-block-template-part,footer{display:none!important}';
+    s.id = 'iframe-hide-style';
+    s.textContent = '.easy-notification-bar,.easy-notification-bar *,header.wp-block-template-part,footer,#wpadminbar{display:none!important;visibility:hidden!important;height:0!important;overflow:hidden!important}body{margin-top:0!important}';
     document.head.appendChild(s);
+    // Also run after DOM ready to catch late-rendered elements
+    function hideElements() {
+      var selectors = ['.easy-notification-bar', 'header.wp-block-template-part', 'footer', '#wpadminbar'];
+      selectors.forEach(function(sel) {
+        var els = document.querySelectorAll(sel);
+        els.forEach(function(el) { el.style.cssText = 'display:none!important'; });
+      });
+    }
+    document.addEventListener('DOMContentLoaded', hideElements);
+    window.addEventListener('load', hideElements);
+    // Run again after 500ms to catch any plugin-delayed rendering
+    setTimeout(hideElements, 500);
   }
 })();
 </script>
