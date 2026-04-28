@@ -123,7 +123,20 @@ html.in-iframe body {
 (function(){
   var inIframe = false;
   try { inIframe = (window.self !== window.top); } catch(e) { inIframe = true; }
-  if(inIframe) { document.documentElement.classList.add('in-iframe'); }
+  if(!inIframe) return;
+  // Add class immediately for CSS
+  document.documentElement.classList.add('in-iframe');
+  // Also run after DOM is ready to handle plugin JS that might override
+  document.addEventListener('DOMContentLoaded', function(){
+    document.documentElement.classList.add('in-iframe');
+    // Find and force-hide the notification bar
+    var nb = document.querySelector('.easy-notification-bar');
+    if(nb) nb.style.cssText = 'display:none!important';
+    var header = document.querySelector('header.wp-block-template-part');
+    if(header) header.style.cssText = 'display:none!important';
+    var footer = document.querySelector('footer');
+    if(footer) footer.style.cssText = 'display:none!important';
+  });
 })();
 </script>
 </head>
