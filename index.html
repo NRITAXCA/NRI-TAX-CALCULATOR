@@ -124,19 +124,17 @@ html.in-iframe body {
   var inIframe = false;
   try { inIframe = (window.self !== window.top); } catch(e) { inIframe = true; }
   if(!inIframe) return;
-  // Add class immediately for CSS
   document.documentElement.classList.add('in-iframe');
-  // Also run after DOM is ready to handle plugin JS that might override
-  document.addEventListener('DOMContentLoaded', function(){
-    document.documentElement.classList.add('in-iframe');
-    // Find and force-hide the notification bar
-    var nb = document.querySelector('.easy-notification-bar');
-    if(nb) nb.style.cssText = 'display:none!important';
-    var header = document.querySelector('header.wp-block-template-part');
-    if(header) header.style.cssText = 'display:none!important';
-    var footer = document.querySelector('footer');
-    if(footer) footer.style.cssText = 'display:none!important';
-  });
+  function hideAll() {
+    var sels = ['.easy-notification-bar','header.wp-block-template-part','footer','#wpadminbar'];
+    sels.forEach(function(s){ document.querySelectorAll(s).forEach(function(el){ el.style.cssText='display:none!important'; }); });
+  }
+  // Run at multiple points to catch plugin overrides
+  document.addEventListener('DOMContentLoaded', hideAll);
+  window.addEventListener('load', hideAll);
+  // Polling to ensure hiding after any delayed plugin init
+  var count = 0;
+  var poll = setInterval(function(){ hideAll(); if(++count >= 10) clearInterval(poll); }, 200);
 })();
 </script>
 </head>
