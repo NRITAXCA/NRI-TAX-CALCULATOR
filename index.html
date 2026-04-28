@@ -106,6 +106,25 @@ OR: Appearance → Editor → Header template → Add Custom HTML block
 </script>
 <link rel="modulepreload" href="https://nritaxca.com/wp-includes/js/dist/script-modules/interactivity/index.min.js?ver=66c613f68580994bb00a" id="@wordpress/interactivity-js-modulepreload" fetchpriority="low">
 <style class='wp-fonts-local'>@font-face{ font-family:Manrope;font-style:normal;font-weight:200 800;font-display:swap;src:url(https://nritaxca.com/wp-content/themes/twentytwentyfive/assets/fonts/manrope/Manrope-VariableFont_wght.woff2) format('woff2') }@font-face{ font-family:"Fira Code";font-style:normal;font-weight:300 700;font-display:swap;src:url(https://nritaxca.com/wp-content/themes/twentytwentyfive/assets/fonts/fira-code/FiraCode-VariableFont_wght.woff2) format('woff2') }</style>
+<style>
+/* Hide header/footer when page is embedded in an iframe */
+html.in-iframe header.wp-block-template-part,
+html.in-iframe .easy-notification-bar,
+html.in-iframe footer {
+  display: none !important;
+}
+html.in-iframe .wp-site-blocks {
+  padding-top: 0 !important;
+}
+</style>
+<script>
+// Detect iframe embedding and add class to html element
+(function(){
+  if(window.self !== window.top){
+    document.documentElement.classList.add('in-iframe');
+  }
+})();
+</script>
 </head>
 
 <body class="wp-singular page-template-default page page-id-59 wp-embed-responsive wp-theme-twentytwentyfive">
