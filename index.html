@@ -115,8 +115,16 @@ html.in-iframe body .easy-notification-bar {
 </style>
 <script>
 (function(){
-  var inIframe = false;
-  try { inIframe = (window.self !== window.top); } catch(e) { inIframe = true; }
+  // PRIMARY: Check URL parameter ?embed=1
+  var params = new URLSearchParams(window.location.search);
+  var embedParam = params.get('embed') === '1';
+  
+  // FALLBACK: Check window.self !== window.top
+  var inIframe = embedParam;
+  if (!inIframe) {
+    try { inIframe = (window.self !== window.top); } catch(e) { inIframe = true; }
+  }
+  
   if(!inIframe) return;
   
   // Apply immediately
