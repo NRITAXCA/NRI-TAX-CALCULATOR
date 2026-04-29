@@ -107,7 +107,7 @@ OR: Appearance → Editor → Header template → Add Custom HTML block
 <link rel="modulepreload" href="https://nritaxca.com/wp-includes/js/dist/script-modules/interactivity/index.min.js?ver=66c613f68580994bb00a" id="@wordpress/interactivity-js-modulepreload" fetchpriority="low">
 <style class='wp-fonts-local'>@font-face{ font-family:Manrope;font-style:normal;font-weight:200 800;font-display:swap;src:url(https://nritaxca.com/wp-content/themes/twentytwentyfive/assets/fonts/manrope/Manrope-VariableFont_wght.woff2) format('woff2') }@font-face{ font-family:"Fira Code";font-style:normal;font-weight:300 700;font-display:swap;src:url(https://nritaxca.com/wp-content/themes/twentytwentyfive/assets/fonts/fira-code/FiraCode-VariableFont_wght.woff2) format('woff2') }</style>
 <style>
-/* Hide header/footer when page is embedded in iframe */
+/* Hide header/footer/notification bar when page is embedded in iframe */
 html.in-iframe .easy-notification-bar,
 html.in-iframe header.wp-block-template-part,
 html.in-iframe footer,
@@ -125,16 +125,23 @@ html.in-iframe body {
   try { inIframe = (window.self !== window.top); } catch(e) { inIframe = true; }
   if(!inIframe) return;
   document.documentElement.classList.add('in-iframe');
+  // Intercept easyNotificationBar config to disable it when in iframe
+  var _enb = undefined;
+  try {
+    Object.defineProperty(window, 'easyNotificationBar', {
+      set: function(v) { _enb = v; if(_enb) { _enb.show_bar = '0'; _enb.status = 'disabled'; } },
+      get: function() { return _enb; },
+      configurable: true
+    });
+  } catch(e) {}
   function hideAll() {
     var sels = ['.easy-notification-bar','header.wp-block-template-part','footer','#wpadminbar'];
     sels.forEach(function(s){ document.querySelectorAll(s).forEach(function(el){ el.style.cssText='display:none!important'; }); });
   }
-  // Run at multiple points to catch plugin overrides
   document.addEventListener('DOMContentLoaded', hideAll);
   window.addEventListener('load', hideAll);
-  // Polling to ensure hiding after any delayed plugin init
   var count = 0;
-  var poll = setInterval(function(){ hideAll(); if(++count >= 10) clearInterval(poll); }, 200);
+  var poll = setInterval(function(){ hideAll(); if(++count >= 20) clearInterval(poll); }, 150);
 })();
 </script>
 </head>
