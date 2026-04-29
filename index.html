@@ -107,20 +107,10 @@ OR: Appearance → Editor → Header template → Add Custom HTML block
 <link rel="modulepreload" href="https://nritaxca.com/wp-includes/js/dist/script-modules/interactivity/index.min.js?ver=66c613f68580994bb00a" id="@wordpress/interactivity-js-modulepreload" fetchpriority="low">
 <style class='wp-fonts-local'>@font-face{ font-family:Manrope;font-style:normal;font-weight:200 800;font-display:swap;src:url(https://nritaxca.com/wp-content/themes/twentytwentyfive/assets/fonts/manrope/Manrope-VariableFont_wght.woff2) format('woff2') }@font-face{ font-family:"Fira Code";font-style:normal;font-weight:300 700;font-display:swap;src:url(https://nritaxca.com/wp-content/themes/twentytwentyfive/assets/fonts/fira-code/FiraCode-VariableFont_wght.woff2) format('woff2') }</style>
 <style>
-/* Hide header/footer/notification bar when page is embedded in iframe */
-html.in-iframe .easy-notification-bar,
-html.in-iframe header.wp-block-template-part,
-html.in-iframe footer,
-html.in-iframe #wpadminbar {
+/* Fallback: hide notification bar in iframe via high-specificity selector */
+html.in-iframe body .easy-notification-bar {
   display: none !important;
   visibility: hidden !important;
-}
-html.in-iframe body {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-html.in-iframe .has-easy-notification-bar {
-  padding-top: 0 !important;
 }
 </style>
 <script>
@@ -128,26 +118,49 @@ html.in-iframe .has-easy-notification-bar {
   var inIframe = false;
   try { inIframe = (window.self !== window.top); } catch(e) { inIframe = true; }
   if(!inIframe) return;
+  
+  // Apply immediately
   var html = document.documentElement;
   html.classList.add('in-iframe');
   html.classList.add('easy-notification-bar-is-disabled');
   html.classList.remove('has-easy-notification-bar');
+  
+  // Inject a late-loading style tag to win over cross-origin stylesheets
+  function injectLateStyle() {
+    var existing = document.getElementById('iframe-hide-style');
+    if (existing) return;
+    var s = document.createElement('style');
+    s.id = 'iframe-hide-style';
+    s.textContent = [
+      'html.in-iframe .easy-notification-bar{display:none!important;visibility:hidden!important}',
+      'html.in-iframe header.wp-block-template-part{display:none!important}',
+      'html.in-iframe footer{display:none!important}',
+      'html.in-iframe #wpadminbar{display:none!important}',
+      'html.in-iframe body{padding-top:0!important;margin-top:0!important}',
+      'html.in-iframe.has-easy-notification-bar .easy-notification-bar{display:none!important}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  
   function hideAll() {
-    var html2 = document.documentElement;
-    html2.classList.add('in-iframe');
-    html2.classList.add('easy-notification-bar-is-disabled');
-    html2.classList.remove('has-easy-notification-bar');
+    var h = document.documentElement;
+    h.classList.add('in-iframe');
+    h.classList.add('easy-notification-bar-is-disabled');
+    h.classList.remove('has-easy-notification-bar');
+    injectLateStyle();
     var sels = ['.easy-notification-bar','header.wp-block-template-part','footer','#wpadminbar'];
     sels.forEach(function(s){
       document.querySelectorAll(s).forEach(function(el){
-        el.style.cssText = 'display:none!important;visibility:hidden!important';
+        el.style.setProperty('display','none','important');
+        el.style.setProperty('visibility','hidden','important');
       });
     });
   }
+  
   document.addEventListener('DOMContentLoaded', hideAll);
   window.addEventListener('load', hideAll);
   var count = 0;
-  var poll = setInterval(function(){ hideAll(); if(++count >= 20) clearInterval(poll); }, 150);
+  var poll = setInterval(function(){ hideAll(); if(++count >= 30) clearInterval(poll); }, 100);
 })();
 </script>
 </head>
