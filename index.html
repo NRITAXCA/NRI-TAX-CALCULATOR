@@ -113,10 +113,14 @@ html.in-iframe header.wp-block-template-part,
 html.in-iframe footer,
 html.in-iframe #wpadminbar {
   display: none !important;
+  visibility: hidden !important;
 }
 html.in-iframe body {
   padding-top: 0 !important;
   margin-top: 0 !important;
+}
+html.in-iframe .has-easy-notification-bar {
+  padding-top: 0 !important;
 }
 </style>
 <script>
@@ -124,19 +128,21 @@ html.in-iframe body {
   var inIframe = false;
   try { inIframe = (window.self !== window.top); } catch(e) { inIframe = true; }
   if(!inIframe) return;
-  document.documentElement.classList.add('in-iframe');
-  // Intercept easyNotificationBar config to disable it when in iframe
-  var _enb = undefined;
-  try {
-    Object.defineProperty(window, 'easyNotificationBar', {
-      set: function(v) { _enb = v; if(_enb) { _enb.show_bar = '0'; _enb.status = 'disabled'; } },
-      get: function() { return _enb; },
-      configurable: true
-    });
-  } catch(e) {}
+  var html = document.documentElement;
+  html.classList.add('in-iframe');
+  html.classList.add('easy-notification-bar-is-disabled');
+  html.classList.remove('has-easy-notification-bar');
   function hideAll() {
+    var html2 = document.documentElement;
+    html2.classList.add('in-iframe');
+    html2.classList.add('easy-notification-bar-is-disabled');
+    html2.classList.remove('has-easy-notification-bar');
     var sels = ['.easy-notification-bar','header.wp-block-template-part','footer','#wpadminbar'];
-    sels.forEach(function(s){ document.querySelectorAll(s).forEach(function(el){ el.style.cssText='display:none!important'; }); });
+    sels.forEach(function(s){
+      document.querySelectorAll(s).forEach(function(el){
+        el.style.cssText = 'display:none!important;visibility:hidden!important';
+      });
+    });
   }
   document.addEventListener('DOMContentLoaded', hideAll);
   window.addEventListener('load', hideAll);
