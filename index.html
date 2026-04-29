@@ -108,7 +108,8 @@ OR: Appearance → Editor → Header template → Add Custom HTML block
 <style class='wp-fonts-local'>@font-face{ font-family:Manrope;font-style:normal;font-weight:200 800;font-display:swap;src:url(https://nritaxca.com/wp-content/themes/twentytwentyfive/assets/fonts/manrope/Manrope-VariableFont_wght.woff2) format('woff2') }@font-face{ font-family:"Fira Code";font-style:normal;font-weight:300 700;font-display:swap;src:url(https://nritaxca.com/wp-content/themes/twentytwentyfive/assets/fonts/fira-code/FiraCode-VariableFont_wght.woff2) format('woff2') }</style>
 <style>
 /* Fallback: hide notification bar in iframe via high-specificity selector */
-html.in-iframe body .easy-notification-bar {
+html.in-iframe body .easy-notification-bar,
+html.in-iframe body #itr-countdown-banner {
   display: none !important;
   visibility: hidden !important;
 }
@@ -141,6 +142,7 @@ html.in-iframe body .easy-notification-bar {
     s.id = 'iframe-hide-style';
     s.textContent = [
       'html.in-iframe .easy-notification-bar{display:none!important;visibility:hidden!important}',
+      'html.in-iframe #itr-countdown-banner{display:none!important;visibility:hidden!important}',
       'html.in-iframe header.wp-block-template-part{display:none!important}',
       'html.in-iframe footer{display:none!important}',
       'html.in-iframe #wpadminbar{display:none!important}',
@@ -156,7 +158,7 @@ html.in-iframe body .easy-notification-bar {
     h.classList.add('easy-notification-bar-is-disabled');
     h.classList.remove('has-easy-notification-bar');
     injectLateStyle();
-    var sels = ['.easy-notification-bar','header.wp-block-template-part','footer','#wpadminbar'];
+    var sels = ['.easy-notification-bar','#itr-countdown-banner','header.wp-block-template-part','footer','#wpadminbar'];
     sels.forEach(function(s){
       document.querySelectorAll(s).forEach(function(el){
         el.style.setProperty('display','none','important');
